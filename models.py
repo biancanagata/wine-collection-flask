@@ -77,3 +77,32 @@ class VisitorSchema(ma.Schema):
 
 visitor_schema = VisitorSchema()
 visitors_schema = VisitorSchema(many=True)
+
+class Wine(db.Model):
+    id = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    grape_variety = db.Column(db.String(100))
+    region = db.Column(db.String(100))
+    price = db.Column(db.Float)
+    user_token = db.Column(db.String, db.ForeignKey('user.token'), nullable=False)
+
+    def __init__(self, name, grape_variety, region, price, user_token, id=''):
+        self.id = self.set_id()
+        self.name = name
+        self.grape_variety = grape_variety
+        self.region = region
+        self.price = price
+        self.user_token = user_token
+
+    def __repr__(self):
+        return f'The following wine has been added to the inventory: {self.name}'
+
+    def set_id(self):
+        return secrets.token_urlsafe()
+
+class WineSchema(ma.Schema):
+    class Meta:
+        fields = ['id', 'name', 'grape_variety', 'region', 'price']
+
+wine_schema = WineSchema()
+wines_schema = WineSchema(many=True)

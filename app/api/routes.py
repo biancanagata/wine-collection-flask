@@ -69,5 +69,59 @@ def delete_visitor(current_user_token, id):
     response = visitor_schema.dump(visitor)
     return jsonify(response)
     
+@api.route('/wines', methods=['POST'])
+@token_required
+def create_wine(current_user_token):
+    name = request.json['name']
+    grape_variety = request.json['grape_variety']
+    region = request.json['region']
+    price = request.json['price']
+    user_token = current_user_token.token
+
+    wine = Wine(name, grape_variety, region, price, user_token=user_token)
+
+    db.session.add(wine)
+    db.session.commit()
+
+    response = wine_schema.dump(wine)
+    return jsonify(response)
+
+@api.route('/wines', methods=['GET'])
+@token_required
+def get_wines(current_user_token):
+    a_user = current_user_token.token
+    wines = Wine.query.filter_by(user_token=a_user).all()
+    response = wines_schema.dump(wines)
+    return jsonify(response)
+
+@api.route('/wines/<id>', methods=['GET'])
+@token_required
+def get_single_wine(current_user_token, id):
+    wine = Wine.query.get(id)
+    response = wine_schema.dump(wine)
+    return jsonify(response)
+
+@api.route('/wines/<id>', methods=['POST', 'PUT'])
+@token_required
+def update_wine(current_user_token, id):
+    wine = Wine.query.get(id)
+    wine.name = request.json['name']
+    wine.grape_variety = request.json['grape_variety']
+    wine.region = request.json['region']
+    wine.price = request.json['price']
+    wine.user_token = current_user_token.token
+
+    db.session.commit()
+    response = wine_schema.dump(wine)
+    return jsonify(response)
+
+@api.route('/wines/<id>', methods=['DELETE'])
+@token_required
+def delete_wine(current_user_token, id):
+    wine = Wine.query.get(id)
+    db.session.delete(wine)
+    db.session.commit()
+    response = wine_schema.dump(wine)
+    return jsonify(response)
 
     
