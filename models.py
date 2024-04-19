@@ -87,7 +87,7 @@ class Wine(db.Model):
     user_token = db.Column(db.String, db.ForeignKey('user.token'), nullable=False)
 
     def __init__(self, name, grape_variety, region, price, user_token, id=''):
-        self.id = self.set_id()
+        self.id = self.set_id() if not id else id
         self.name = name
         self.grape_variety = grape_variety
         self.region = region
